@@ -1,0 +1,33 @@
+
+group is
+   $/basis.cm
+   $/smlnj-lib.cm
+   $/pp-lib.cm
+   $/controls-lib.cm
+   $/ml-lpt-lib.cm
+
+   ../../common
+      (basic-control.sml
+       error.sml
+       float-lit.sml
+       integer-lit.sml
+       literal.sml
+       stamp.sml
+       stats.sml
+       basis.sml
+       pp.sml
+       layout-sig.sml
+       layout.sml)
+
+   ../../parser/mk-ast.sml
+   ../../parser/spec-parse-tree.sml
+   ../../parser/spec.l : ml-ulex
+   ../../parser/spec.g : ml-antlr
+   ../../parser/parser.sml
+   ../../semantic/spec-abstract-tree.sml
+   ../../semantic/symbol-table-type.sml
+   ../../semantic/lang-types.sml
+   ../../semantic/resolve-symbols.sml
+   ../../semantic/resolve-type-info.sml
+   ../../semantic/primitives.sml
+   ../../opt/inline.sml
