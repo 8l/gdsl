@@ -1,0 +1,52 @@
+
+group is
+   $/basis.cm
+   $/smlnj-lib.cm
+   $/pp-lib.cm
+   $/controls-lib.cm
+   $/ml-lpt-lib.cm
+
+   ../../common
+      (basic-control.sml
+       error.sml
+       float-lit.sml
+       integer-lit.sml
+       literal.sml
+       stamp.sml
+       stats.sml
+       basis.sml
+       layout-sig.sml
+       layout.sml
+       pp.sml
+       compilation-monad.sml
+       sum-sig.sml
+       sum.sml)
+
+   ../../parser/mk-ast.sml
+   ../../parser/spec-parse-tree.sml
+   ../../parser/spec.l : ml-ulex
+   ../../parser/spec.g : ml-antlr
+   ../../parser/parser.sml
+   ../../semantic/symbol-table-type.sml
+   ../../semantic/spec-abstract-tree.sml
+   ../../semantic/typing/boolean-domain.sml
+   ../../semantic/typing/lang-types.sml
+   ../../semantic/typing/substitutions.sml
+   ../../semantic/typing/tvar.sml
+   ../../semantic/typing/environment.sml
+   ../../semantic/inference.sml
+   ../../semantic/primitives.sml
+   ../../semantic/resolve-symbols.sml
+   ../../semantic/resolve-type-info.sml
+   ../../spec/core.sml
+   ../../spec/spec.sml
+   ../../desugar/desugar-control.sml
+   ../../desugar/desugared-tree.sml
+   ../../desugar/split-declarations.sml
+   ../../desugar/desugar-guards.sml
+   ../../desugar/inline-decode-patterns.sml
+   ../../desugar/detokenize.sml
+   ../../desugar/retokenize.sml
+   ../../desugar/desugar-decode-syntax.sml
+   ../../desugar/desugar.sml
+   ../../driver/main.sml
