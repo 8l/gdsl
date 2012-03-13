@@ -111,7 +111,7 @@ Decl
    | "type" Name "=" Ty => (markDecl (FULL_SPAN, PT.TYPEdecl (Name, Ty)))
    | "val" Name Name* "=" Exp =>
       (markDecl (FULL_SPAN, PT.LETRECdecl (Name1, Name2, Exp)))
-   | "val" Name "[" DecodePat+ "]" decl=
+   | "val" Name "[" DecodePat* "]" decl=
       ( "=" Exp =>
          (PT.DECODEdecl (Name, DecodePat, Sum.INL Exp))
       | ("|" Exp "=" Exp)+ =>
@@ -167,7 +167,7 @@ PrimBitPat
 
 Exp
    : ClosedExp => (ClosedExp)
-   | "case" ClosedExp "of" Cases =>
+   | "case" ClosedExp "of" Cases "end" =>
       (mark PT.MARKexp (FULL_SPAN, PT.CASEexp (ClosedExp, Cases)))
    ;
 
@@ -189,10 +189,8 @@ MonadicExp
       (mark PT.MARKseqexp (FULL_SPAN, PT.BINDseqexp (Name, Exp)))
    ;
 
-(* HACK *)
 Cases
-   : %try Pat ":" ClosedExp "|" Cases => ((Pat, ClosedExp)::Cases)
-   | %try Pat ":" ClosedExp => ([(Pat, ClosedExp)])
+   : Pat ":" Exp ("|" Pat ":" Exp)* => ((Pat, Exp)::SR)
    ;
 
 Pat
