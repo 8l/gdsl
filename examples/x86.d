@@ -150,14 +150,19 @@ val xmm7 = return (REG XMM7)
 
 # A type alias used for instructions taking two arguments
 type binop = {opnd1:opnd, opnd2:opnd}
+type trinop = {opnd1:opnd, opnd2:opnd, opnd3:opnd}
 
 datatype insn =
    ADD of binop
  | MOV of binop
+ | MASKMOVDQU of binop
+ | VMASKMOVDQU of binop
  | CVTPD2PI of binop
  | XADD of binop
  | PHADDW of binop
  | PHADDD of binop
+ | VPHADDW of trinop
+ | VPHADDD of trinop
 
 val imm8 ['b:8'] = return (IMM8 b)
 val imm16 ['b1:8 b2:8'] = return (IMM16 (b1 ^ b2))
@@ -194,6 +199,8 @@ val reg8r n =
 val reg8? rex =
    if rex == 0 then reg8 else reg8r
 
+val reg8F n = (reg8? (prefix n)) (suffix n)
+
 val reg16 n =
    case n of
       '000': REG AX
@@ -220,6 +227,8 @@ val reg16r n =
 
 val reg16? rex =
    if rex == 0 then reg16 else reg16r
+
+val reg16F n = (reg16? (prefix n)) (suffix n)
 
 val reg32 n =
    case n of
@@ -248,6 +257,8 @@ val reg32r n =
 val reg32? rex =
    if rex == 0 then reg32 else reg32r
 
+val reg32F n = (reg32? (prefix n)) (suffix n)
+
 val reg64 n =
    case n of
       '000': REG RAX
@@ -274,6 +285,8 @@ val reg64r n =
 
 val reg64? rex =
    if rex == 0 then reg64 else reg64r
+
+val reg64F n = (reg64? (prefix n)) (suffix n)
 
 val sreg3 n =
    case n of
@@ -314,6 +327,8 @@ val xmmr n =
 val xmm? rex =
    if rex == 0 then xmm else xmmr
 
+val xmmF n = (xmm? (prefix n)) (suffix n)
+
 val mm n =
    case n of
       '000': REG MM0
@@ -340,6 +355,8 @@ val mmr n =
 
 val mm? rex =
    if rex == 0 then mm else mmr
+
+val mmF n = (mm? (prefix n)) (suffix n)
 
 # Deslice the mod/rm byte and put it into the the state
 
@@ -495,6 +512,11 @@ val r64 = r/ reg64?
 val mm64 = r/ mm?
 val xmm128 = r/ xmm?
 
+val vex/xmm = do
+   vexv <- query $vexv;
+   return (xmmF (not vexv))
+end
+
 val moffs8 = do
    i <- imm8;
    mem i
@@ -523,12 +545,23 @@ val binop cons giveOp1 giveOp2 = do
    #   return (MOV {op1, op2})
 end
 
-val mov = binop MOV
+val trinop cons giveOp1 giveOp2 giveOp3 = do
+   op1 <- giveOp1;
+   op2 <- giveOp2;
+   op3 <- giveOp3;
+   return (cons {op1=op1, op2=op2, op3=op3})
+end
+
 val add = binop ADD
+val mov = binop MOV
+val maskmovdqu = binop MASKMOVDQU
+val vmaskmovdqu = binop VMASKMOVDQU
 val cvtpdf2pi = binop CVTPD2PI
 val xadd = binop XADD
 val phaddw = binop PHADDW
 val phaddd = binop PHADDD
+val vphaddw = trinop VPHADDW
+val vphaddd = trinop VPHADDD
 
 ## The VEX prefixes
 
@@ -574,9 +607,9 @@ val main [] = one-byte-opcode
 val main [/vex] = do
    vexm <- query $vexm;
    case vexm of
-      '00001': two-byte-opcode-0f
-    | '00010': three-byte-opcode-0f-38
-#   | '00011': three-byte-opcode-0f-3a
+      '00001': two-byte-opcode-0f-vex
+    | '00010': three-byte-opcode-0f-38-vex
+#   | '00011': three-byte-opcode-0f-3a-vex
 #   | _: one-byte-opcode
     end
 end
@@ -670,6 +703,14 @@ val one-byte-opcode [0xC7 /0]
 
 ## Two Byte Opcodes with Prefix 0x0f
 
+### MASKMOVDQU Vol. 2B 4-9
+val two-byte-opcode-0f [0xf7 /r] 
+(* | $mod == '11'*) = maskmovdqu xmm128 xmm/m128
+val two-byte-opcode-0f-vex [0xf7 /r] 
+(* | $mod == '11' && VEX.128.66.0F.WIG*) = vmaskmovdqu xmm128 xmm/m128
+
+### MASKMOVQ Vol. 2B 4-11
+
 ### CVTPD2PI Vol 2A 3-248
 val two-byte-opcode-0f [0x2d /r] = cvtpdf2pi mm64 xmm/m128
 
@@ -689,3 +730,7 @@ val three-byte-opcode-0f-38 [01 /r]
 val three-byte-opcode-0f-38 [02 /r]
  | $opndsz = phaddd xmm128 xmm/m128
  | otherwise = phaddd mm64 mm/m64
+val three-byte-opcode-0f-38-vex [01 /r]
+ | $opndsz (*andalso (not $vexl)*) = vphaddw xmm128 vex/xmm xmm/m128
+val three-byte-opcode-0f-38-vex [02 /r]
+ | $opndsz (*andalso (not $vexl)*) = vphaddd xmm128 vex/xmm xmm/m128
