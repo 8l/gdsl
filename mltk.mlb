@@ -1,0 +1,53 @@
+
+local
+   $(SML_LIB)/basis/basis.mlb
+   $(SML_LIB)/smlnj-lib/Util/smlnj-lib.mlb
+   $(SML_LIB)/smlnj-lib/PP/pp-lib.mlb
+   $(SML_LIB)/smlnj-lib/Controls/controls-lib.mlb
+   (*$(SML_LIB)/mllpt-lib/ml-lpt-lib.mlb*)
+   $(SML_LIB)/ml-lpt/lib/ml-lpt-lib.mlb
+in
+   ann
+      "forceUsed"
+      (* "sequenceNonUnit warn" *)
+      (* "warnUnused true" *)
+   in
+      local
+         detail/common/basic-control.sml
+         detail/common/error.sml
+         detail/common/float-lit.sml
+         detail/common/integer-lit.sml
+         detail/common/literal.sml
+         detail/common/stamp.sml
+         detail/common/basis.sml
+         detail/common/layout-sig.sml
+         detail/common/layout.sml
+         detail/common/pp.sml
+         detail/common/compilation-monad.sml
+         detail/parser/mk-ast.sml
+         detail/parser/spec-parse-tree.sml
+         ann
+            "warnUnused false"
+         in
+            detail/parser/spec.g.sml
+            detail/parser/spec.l.sml
+         end
+         detail/parser/parser.sml
+         detail/semantic/symbol-table-type.sml
+         detail/semantic/spec-abstract-tree.sml
+         detail/semantic/typing/boolean-domain.sml
+         detail/semantic/typing/tvar.sml
+         detail/semantic/typing/lang-types.sml
+         detail/semantic/typing/environment.sml
+         detail/semantic/primitives.sml
+         detail/semantic/resolve-symbols.sml
+         detail/semantic/resolve-type-info.sml
+         detail/semantic/primitives.sml
+         detail/opt/inline.sml
+         detail/driver/main.sml
+         detail/ml/mlton/main.sml
+      in
+         detail/export.sml
+      end
+   end
+end
