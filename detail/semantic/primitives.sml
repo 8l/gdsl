@@ -35,6 +35,12 @@ structure Primitives = struct
    val stateI = freshVar ()
    val stateI' = newFlow stateI
    val stateI'' = newFlow stateI
+   val stateJ = freshVar ()
+   val stateJ' = newFlow stateJ
+   val stateK = freshVar ()
+   val stateK' = newFlow stateK
+   val stateL = freshVar ()
+   val stateL' = newFlow stateL
    val a = freshVar ()
    val a' = newFlow a
    val b = freshVar ()
@@ -82,12 +88,12 @@ structure Primitives = struct
         flow = noFlow},
        {name="false", ty=VEC (CONST 1),
         flow = noFlow},
-       {name="%consume", ty=MONAD (VEC size,stateA, stateA'),
+       {name="consume", ty=MONAD (VEC size,stateA, stateA'),
         flow = BD.meetVarZero (bvar size) o
                BD.meetVarImpliesVar (bvar stateA', bvar stateA)},
-       {name="%unconsume", ty=MONAD (UNIT,stateB, stateB'),
+       {name="unconsume", ty=MONAD (UNIT,stateB, stateB'),
         flow = BD.meetVarImpliesVar (bvar stateB', bvar stateB)}, 
-       (* TODO *) {name="%slice", ty=MONAD (freshVar (),stateC, stateC'),
+       {name="slice", ty=MONAD (freshVar (),stateC, stateC'),
         flow = BD.meetVarImpliesVar (bvar stateC', bvar stateC)},
        {name="raise", ty=MONAD (freshVar (),stateD, stateD'),
         flow = noFlow},
@@ -158,7 +164,14 @@ structure Primitives = struct
        {name="suffix", ty=FUN (VEC s17, VEC s18),
         flow = BD.meetVarZero (bvar s17) o
                BD.meetVarZero (bvar s18) o
-               BD.meetVarZero (bvar s19)}
+               BD.meetVarZero (bvar s19)},
+       {name="%consume", ty=MONAD (VEC size,stateJ, stateJ'),
+        flow = BD.meetVarZero (bvar size) o
+               BD.meetVarImpliesVar (bvar stateJ', bvar stateJ)},
+       {name="%unconsume", ty=MONAD (UNIT,stateK, stateK'),
+        flow = BD.meetVarImpliesVar (bvar stateK', bvar stateK)}, 
+       {name="%slice", ty=MONAD (freshVar (),stateL, stateL'),
+        flow = BD.meetVarImpliesVar (bvar stateL', bvar stateL)}
        ]
 
    val primitiveSizeConstraints =
