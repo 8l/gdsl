@@ -7,6 +7,8 @@ structure TypeInference : sig
 
    type symbol_types = (SymbolTable.symid * Environment.symbol_type) list
        
+   val getBitpatLitLength : SpecAbstractTree.bitpat_lit -> int
+
    val typeInferencePass: (Error.err_stream * ResolveTypeInfo.type_info * 
                            SpecAbstractTree.specification) -> symbol_types
    val run: ResolveTypeInfo.type_info * SpecAbstractTree.specification ->
@@ -24,12 +26,6 @@ end = struct
    structure PP = SpecAbstractTree.PP
    
    type symbol_types = (SymbolTable.symid * E.symbol_type) list
-
-   (*structure SMap = RedBlackMapFn (
-      struct
-         type ord_key = SymbolTable.symid
-         val compare = SymbolTable.compare_symid
-      end)*)
 
    open Types
 
@@ -67,6 +63,19 @@ end = struct
            "\n\t" ^ str2 ^ ": " ^ eStr2)
       end
 
+   fun getBitpatLitLength bp =
+      let
+         val fields = String.fields (fn c => c= #"|") bp
+         fun checkWidth (f,width) =
+            if String.size f <> width then
+                  raise S.UnificationFailure "bit literals have different lengths"
+            else width
+      in
+         case fields of
+            [] => 0
+          | (f::fs) => List.foldl checkWidth (String.size f) fs
+      end
+         
 fun typeInferencePass (errStrm, ti : TI.type_info, ast) = let
    val sm = ref ([] : symbol_types)
    val { tsynDefs, typeDefs, conParents} = ti
@@ -93,7 +102,7 @@ fun typeInferencePass (errStrm, ti : TI.type_info, ast) = let
      | topDecl (AST.LETRECdecl vd) = topLetrecDecl vd
      | topDecl _ = []
 
-   and topDecodeDecl (v, _, _) = [(v, true)]
+   and topDecodeDecl (v, _, _, _) = [(v, true)]
 
    and topLetrecDecl (v, _, _) = [(v,false)]
    
@@ -285,7 +294,7 @@ fun typeInferencePass (errStrm, ti : TI.type_info, ast) = let
          infBinding (st,env) (v, [], NONE, l, e)
      | infDecl (st,env) _ = (E.SymbolSet.empty, env)
 
-   and infDecodedecl (st,env) (v, l, Sum.INL e) =
+   and infDecodedecl (st,env) (v, l, _, Sum.INL e) =
       let
          val env = E.pushFunctionOrTop (v,env)
          val envRhs = E.popKappa env
@@ -300,7 +309,7 @@ fun typeInferencePass (errStrm, ti : TI.type_info, ast) = let
       in
          checkUsages false (v,env)
       end
-     | infDecodedecl (st,env) (v, l, Sum.INR el) =
+     | infDecodedecl (st,env) (v, l, _, Sum.INR el) =
       let
          val env = E.pushFunctionOrTop (v,env)
          val env = List.foldl
@@ -444,7 +453,7 @@ fun typeInferencePass (errStrm, ti : TI.type_info, ast) = let
          (*val _ = TextIO.print ("**** after rec reduce:\n" ^ E.toString env ^ "\n")*)
          val env = E.pushType (false, tf', env)
          val env = E.reduceToFunction env
-         (*val _ = TextIO.print ("**** rec selector:\n" ^ E.topToString env ^ "\n")*)
+         val _ = TextIO.print ("**** rec selector:\n" ^ E.topToString env ^ "\n")
       in
          env
       end
@@ -592,7 +601,7 @@ fun typeInferencePass (errStrm, ti : TI.type_info, ast) = let
    and infBitpatSize stenv (AST.MARKbitpat m) =
          reportError infBitpatSize stenv m
      | infBitpatSize (st,env) (AST.BITSTRbitpat str) =
-         E.pushType (false, CONST (String.size str), env)
+         E.pushType (false, CONST (getBitpatLitLength str), env)
      | infBitpatSize (st,env) (AST.NAMEDbitpat v) = E.pushWidth (v,env)
      | infBitpatSize (st,env) (AST.BITVECbitpat (v,s)) =
          E.pushType (false, CONST (IntInf.toInt s), env)
@@ -601,18 +610,18 @@ fun typeInferencePass (errStrm, ti : TI.type_info, ast) = let
      | infBitpat (st,env) (AST.NAMEDbitpat v) =
          (1, E.pushSymbol (v, getSpan st, env))
      | infBitpat (st,env) (AST.BITVECbitpat (v,s)) =
-         let
-            val env = E.pushLambdaVar (v,env)
-            val envVar = E.pushSymbol (v, getSpan st, env)
-            val envWidth = E.pushType (false, VEC (CONST (IntInf.toInt s)), env)
-            val env = E.meet (envVar, envWidth)
-            val env = E.popKappa env
-         in
-            (1, env)
-         end
+      let
+         val env = E.pushLambdaVar (v,env)
+         val envVar = E.pushSymbol (v, getSpan st, env)
+         val envWidth = E.pushType (false, VEC (CONST (IntInf.toInt s)), env)
+         val env = E.meet (envVar, envWidth)
+         val env = E.popKappa env
+      in
+         (1, env)
+      end
    and infTokpat stenv (AST.MARKtokpat m) = reportError infTokpat stenv m
      | infTokpat (st,env) (AST.TOKtokpat i) = (0, env)
-     | infTokpat (st,env) (AST.NAMEDtokpat v) = (1, E.pushLambdaVar (v,env))
+     | infTokpat (st,env) (AST.NAMEDtokpat (v,_)) = (1, E.pushLambdaVar (v,env))
    and infMatch (st,env) (p,e) =
       let
          val (n,env) = infPat (st,env) p

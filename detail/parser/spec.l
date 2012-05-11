@@ -79,13 +79,13 @@
 %let esc = "\\"[abfnrtv\\\"]|"\\"{dig}{dig}{dig};
 %let sgood = [\032-\126]&[^\"\\];
 %let ws = " "|[\t\n\v\f\r];
-%let binary = [0-1\.];
+%let binary = [0-1\.|];
 %let bitstr = {binary}+;
 %let sym=[-!%&$+/:<=>?@~`\^|#*\\];
 %let symid={sym}+;
 
 <INITIAL>"granularity" => (T.KW_granularity);
-<INITIAL>"state" => (T.KW_state);
+<INITIAL>"with" => (T.KW_with);
 <INITIAL>"include" => (T.KW_include);
 <INITIAL>"export" => (T.KW_export);
 <INITIAL>"datatype" => (T.KW_datatype);
@@ -101,8 +101,8 @@
 <INITIAL>"do" => (T.KW_do);
 <INITIAL>"in" => (T.KW_in);
 <INITIAL>"div" => (T.KW_div);
-<INITIAL>"andalso" => (T.KW_andalso);
-<INITIAL>"orelse" => (T.KW_orelse);
+<INITIAL>"andalso" => (T.KW_and);
+<INITIAL>"orelse" => (T.KW_or);
 <INITIAL>"<-" => (T.BIND);
 <INITIAL>"%" => (T.KW_mod);
 <INITIAL>"of" => (T.KW_of);
@@ -124,6 +124,8 @@
 <INITIAL>")" => (T.RP);
 <INITIAL>"+" => (T.PLUS);
 <INITIAL>"-" => (T.MINUS);
+<INITIAL>"<" => (T.LESSTHAN);
+<INITIAL>">" => (T.GREATERTHAN);
 <INITIAL>"~" => (T.TILDE);
 <INITIAL>"'" => (YYBEGIN BITPAT; T.TICK);
 <INITIAL>"." => (T.DOT);

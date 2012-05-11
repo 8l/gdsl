@@ -18,11 +18,11 @@
    | KW_of ("of")
    | KW_granularity ("granularity")
    | KW_raise ("raise")
-   | KW_state ("state")
+   | KW_with ("with")
    | KW_then ("then")
    | KW_type ("type")
-   | KW_andalso ("andalso")
-   | KW_orelse ("orelse")
+   | KW_and ("and")
+   | KW_or ("or")
    | WITH ("@")
    | SELECT ("$")
    | BIND ("<-")
@@ -38,6 +38,8 @@
    | CONCAT ("^")
    | PLUS ("+")
    | MINUS ("-")
+   | LESSTHAN ("<")
+   | GREATERTHAN (">")
    | TIMES ("*")
    | SLASH ("/")
    | TILDE ("~")
@@ -105,7 +107,6 @@ Decl
    : "granularity" "=" Int => (markDecl (FULL_SPAN, PT.GRANULARITYdecl Int))
    | "export" "=" Qid* => (markDecl (FULL_SPAN, PT.EXPORTdecl Qid))
    | "include" STRING => (markDecl (FULL_SPAN, PT.INCLUDEdecl STRING))
-   | "state" "=" StateTy => (markDecl (FULL_SPAN, PT.STATEdecl StateTy))
    | "datatype" Name "=" ConDecls =>
       (markDecl (FULL_SPAN, PT.DATATYPEdecl (Name, ConDecls)))
    | "type" Name "=" Ty => (markDecl (FULL_SPAN, PT.TYPEdecl (Name, Ty)))
@@ -113,18 +114,13 @@ Decl
       (markDecl (FULL_SPAN, PT.LETRECdecl (Name1, Name2, Exp)))
    | "val" Sym Name* "=" Exp =>
       (markDecl (FULL_SPAN, PT.LETRECdecl (Sym, Name, Exp)))
-   | "val" Name "[" DecodePat* "]" decl=
+   | "val" Name "[" DecodePat* WithClauses "]" decl=
       ( "=" Exp =>
-         (PT.DECODEdecl (Name, DecodePat, Sum.INL Exp))
+         (PT.DECODEdecl (Name, DecodePat, WithClauses, Sum.INL Exp))
       | ("|" Exp "=" Exp)+ =>
-         (PT.DECODEdecl (Name, DecodePat, Sum.INR SR))) =>
+         (PT.DECODEdecl (Name, DecodePat, WithClauses, Sum.INR SR))) =>
       (markDecl (FULL_SPAN, decl))
    ; 
-
-StateTy
-   : "{" Name ":" Ty "=" Exp ("," Name ":" Ty "=" Exp)* "}" =>
-      ((Name, Ty, Exp)::SR)
-   ;
 
 ConDecls
    : ConDecl ("|" ConDecl)* => (ConDecl::SR)
@@ -141,6 +137,16 @@ Ty
       (mark PT.MARKty (FULL_SPAN, PT.RECORDty ((Name, Ty)::SR)))
    ;
 
+WithClauses
+   : "with" WithClause ("," WithClause)* => (WithClause::SR)
+   | => ([])
+   ;
+
+WithClause
+   : Name "=" "'" BITSTR "'" =>
+      (mark PT.MARKwithclause (FULL_SPAN, PT.WITHwithclause (Name, BITSTR)))
+   ;
+
 DecodePat
    : BitPat => (BitPat)
    | TokPat => (mark PT.MARKdecodepat (FULL_SPAN, PT.TOKENdecodepat TokPat))
@@ -153,7 +159,23 @@ BitPat
 
 TokPat
    : Int => (mark PT.MARKtokpat (FULL_SPAN, PT.TOKtokpat Int))
-   | Qid => (mark PT.MARKtokpat (FULL_SPAN, PT.NAMEDtokpat Qid))
+   | Qid Specializes? =>
+      (mark PT.MARKtokpat
+         (FULL_SPAN,
+          case Specializes of
+            NONE => PT.NAMEDtokpat (Qid,[])
+          | SOME sps => PT.NAMEDtokpat (Qid,sps)))
+   ;
+
+Specializes
+   : "<" Specialize ("," Specialize)* ">" => (Specialize::SR)
+   ;
+
+Specialize
+   : Qid "=" "'" BITSTR "'" => (mark PT.MARKspecial
+                           (FULL_SPAN, PT.BINDspecial (Qid, BITSTR)))
+   | Qid => (mark PT.MARKspecial
+               (FULL_SPAN, PT.FORWARDspecial Qid))
    ;
 
 PrimBitPat
@@ -208,7 +230,7 @@ OrElseExp
    ;
 
 OrElse
-   : "orelse" => (mark PT.MARKinfixop (FULL_SPAN, PT.OPinfixop Op.orElse))
+   : "or" => (mark PT.MARKinfixop (FULL_SPAN, PT.OPinfixop Op.orElse))
    ;
 
 AndAlsoExp
@@ -217,7 +239,7 @@ AndAlsoExp
    ;
 
 AndAlso
-   : "andalso" => (mark PT.MARKinfixop (FULL_SPAN, PT.OPinfixop Op.andAlso))
+   : "and" => (mark PT.MARKinfixop (FULL_SPAN, PT.OPinfixop Op.andAlso))
    ;
 
 RExp
@@ -265,7 +287,6 @@ AtomicExp
    | "@" "{" Name "=" Exp ("," Name "=" Exp)* "}" =>
       (mark PT.MARKexp (FULL_SPAN, PT.UPDATEexp ((Name, Exp)::SR)))
    | "$" Qid => (mark PT.MARKexp (FULL_SPAN, PT.SELECTexp Qid))
-   | "{" "}" => (mark PT.MARKexp (FULL_SPAN, PT.RECORDexp []))
    | "(" Exp ")" => (Exp)
    | "{" "}" => (mark PT.MARKexp (FULL_SPAN, PT.RECORDexp []))
    | "{" Name "=" Exp ("," Name "=" Exp)* "}" =>
@@ -304,6 +325,8 @@ ConUse
 
 Sym
    : SYMBOL => (SYMBOL)
+   | "<" => (Atom.atom "<")
+   | ">" => (Atom.atom ">")
    ;
 
 Qid
