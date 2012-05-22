@@ -64,6 +64,206 @@ val /rex-p ['0100 w:1 r:1 x:1 b:1'] =
    update @{rex='1', rexw=w, rexb=b, rexx=x, rexr=r}
 val clear-rex = update @{rexw='0',rexb='0',rexr='0',rexx='0'}
 
+val /vex/0f [0xc4 'r:1 x:1 b:1 00001' 'w:1 v:4 l:1 00'] = do
+   update
+      @{rex='1',
+        rexw=w,
+        vexw=w,
+        rexr=not r,
+        rexb=not b,
+        rexx=not x,
+        vexl=l,
+        vexv=not v,
+        vexm='00001'}
+end
+
+val /vex/0f [0xc5 'r:1 v:4 l:1 00'] = do
+   update
+      @{rex='1',
+        rexw='0',
+        vexw='0',
+        rexr=not r,
+        vexl=l,
+        vexv=v,
+        vexm='00001'} #TODO: sane default value for vexm,rexw,rexb,..
+end
+
+val /vex/66/0f [0xc4 'r:1 x:1 b:1 00001' 'w:1 v:4 l:1 01'] = do
+   update
+      @{rex='1',
+        rexw=w,
+        vexw=w,
+        rexr=not r,
+        rexb=not b,
+        rexx=not x,
+        vexl=l,
+        vexv=not v,
+        vexm='00001'}
+end
+
+val /vex/66/0f [0xc5 'r:1 v:4 l:1 01'] = do
+   update
+      @{rex='1',
+        rexw='0',
+        vexw='0',
+        rexr=not r,
+        vexl=l,
+        vexv=not v,
+        vexm='00001'} #TODO: sane default value for vexm,rexw,rexb,..
+end
+
+val /vex/f3/0f [0xc4 'r:1 x:1 b:1 00001' 'w:1 v:4 l:1 10'] = do
+   update
+      @{rex='1',
+        rexw=w,
+        vexw=w,
+        rexr=not r,
+        rexb=not b,
+        rexx=not x,
+        vexl=l,
+        vexv=not v,
+        vexm='00001'}
+end
+
+val /vex/f3/0f [0xc5 'r:1 v:4 l:1 10'] = do
+   update
+      @{rex='1',
+        rexw='0',
+        vexw='0',
+        rexr=not r,
+        vexl=l,
+        vexv=not v,
+        vexm='00001'} #TODO: sane default value for vexm,rexw,rexb,..
+end
+
+val /vex/f2/0f [0xc4 'r:1 x:1 b:1 00001' 'w:1 v:4 l:1 11'] = do
+   update
+      @{rex='1',
+        rexw=w,
+        vexw=w,
+        rexr=not r,
+        rexb=not b,
+        rexx=not x,
+        vexl=l,
+        vexv=not v,
+        vexm='00001'}
+end
+
+val /vex/f2/0f [0xc5 'r:1 v:4 l:1 11'] = do
+   update
+      @{rex='1',
+        rexw='0',
+        vexw='0',
+        rexr=not r,
+        vexl=l,
+        vexv=not v,
+        vexm='00001'} #TODO: sane default value for vexm,rexw,rexb,..
+end
+
+val /vex/0f/38 [0xc4 'r:1 x:1 b:1 00010' 'w:1 v:4 l:1 00'] = do
+   update
+      @{rex='1',
+        rexw=w,
+        vexw=w,
+        rexr=not r,
+        rexb=not b,
+        rexx=not x,
+        vexl=l,
+        vexv=not v,
+        vexm='00010'}
+end
+
+val /vex/66/0f/38 [0xc4 'r:1 x:1 b:1 00010' 'w:1 v:4 l:1 01'] = do
+   update
+      @{rex='1',
+        rexw=w,
+        vexw=w,
+        rexr=not r,
+        rexb=not b,
+        rexx=not x,
+        vexl=l,
+        vexv=not v,
+        vexm='00010'}
+end
+
+val /vex/f2/0f/38 [0xc4 'r:1 x:1 b:1 00010' 'w:1 v:4 l:1 11'] = do
+   update
+      @{rex='1',
+        rexw=w,
+        vexw=w,
+        rexr=not r,
+        rexb=not b,
+        rexx=not x,
+        vexl=l,
+        vexv=not v,
+        vexm='00010'}
+end
+
+val /vex/f3/0f/38 [0xc4 'r:1 x:1 b:1 00010' 'w:1 v:4 l:1 10'] = do
+   update
+      @{rex='1',
+        rexw=w,
+        vexw=w,
+        rexr=not r,
+        rexb=not b,
+        rexx=not x,
+        vexl=l,
+        vexv=not v,
+        vexm='00010'}
+end
+
+val /vex/0f/3a [0xc4 'r:1 x:1 b:1 00011' 'w:1 v:4 l:1 00'] = do
+   update
+      @{rex='1',
+        rexw=w,
+        vexw=w,
+        rexr=not r,
+        rexb=not b,
+        rexx=not x,
+        vexl=l,
+        vexv=not v,
+        vexm='00011'}
+end
+
+val /vex/66/0f/3a [0xc4 'r:1 x:1 b:1 00011' 'w:1 v:4 l:1 01'] = do
+   update
+      @{rex='1',
+        rexw=w,
+        vexw=w,
+        rexr=not r,
+        rexb=not b,
+        rexx=not x,
+        vexl=l,
+        vexv=not v,
+        vexm='00011'}
+end
+
+val /vex/f2/0f/3a [0xc4 'r:1 x:1 b:1 00011' 'w:1 v:4 l:1 11'] = do
+   update
+      @{rex='1',
+        rexw=w,
+        vexw=w,
+        rexr=not r,
+        rexb=not b,
+        rexx=not x,
+        vexl=l,
+        vexv=not v,
+        vexm='00011'}
+end
+
+val /vex/f3/0f/3a [0xc4 'r:1 x:1 b:1 00011' 'w:1 v:4 l:1 10'] = do
+   update
+      @{rex='1',
+        rexw=w,
+        vexw=w,
+        rexr=not r,
+        rexb=not b,
+        rexx=not x,
+        vexl=l,
+        vexv=not v,
+        vexm='00011'}
+end
+
 val p64 [0x66] = do set-opndsz; p/66 end
 val p64 [0xf2] = do set-repne; p/f2 end
 val p64 [0xf3] = do set-rep; p/f3 end
@@ -313,6 +513,14 @@ datatype register =
  | FS
  | GS
  | CS
+ | ST0
+ | ST1
+ | ST2
+ | ST3
+ | ST4
+ | ST5
+ | ST6
+ | ST7
 
 datatype opnd =
    IMM8 of 8
@@ -341,25 +549,17 @@ datatype insn =
  | FLOW1 of {tag:mnemonic,opnd1:flowopnd}
 
 datatype mnemonic =
-   ADD
- | PXOR
- | CVTSI2SD
- | BT
- | DEC
- | IDIV
- | LEAVE
- | XORPD
- | DIVSD
- | RDTSC
- | RDTSCP
- | SYSCALL
- | BSWAP
- | XCHG
- | CMPXCHG
+   ADC
+ | ADD
  | AND
+ | BSF
+ | BSR
+ | BSWAP
+ | BT
  | CALL
  | CBW
  | CDQE
+ | CLD
  | CMOVA
  | CMOVAE
  | CMOVB
@@ -395,10 +595,40 @@ datatype mnemonic =
  | CMPSD
  | CMPSQ
  | CMPSW
+ | CMPXCHG
+ | CPUID
  | CVTPD2PI
+ | CVTSI2SD
  | CWDE
+ | DEC
  | DIV
+ | DIVSD
+ | FCHS
+ | FCMOVB
+ | FCMOVBE
+ | FCMOVE
+ | FCMOVNB
+ | FCMOVNBE
+ | FCMOVNE
+ | FCMOVNU
+ | FCMOVU
+ | FLD
+ | FLD1
+ | FLDCW
+ | FLDENV
+ | FLDL2E
+ | FLDL2T
+ | FLDLG2
+ | FLDLN2
+ | FLDPI
+ | FLDZ
+ | FNSTCW
+ | FST
+ | FSTCW
+ | FSTP
+ | FUCOMIP
  | HLT
+ | IDIV
  | IMUL
  | INC
  | JA
@@ -435,7 +665,10 @@ datatype mnemonic =
  | JRCXZ
  | JS
  | JZ
+ | LDDQU
  | LEA
+ | LEAVE
+ | LFENCE
  | MASKMOVDQU
  | MASKMOVQ
  | MAXPD
@@ -475,6 +708,7 @@ datatype mnemonic =
  | MOVSB
  | MOVSD
  | MOVSQ
+ | MOVSS
  | MOVSW
  | MOVSX
  | MOVSXD
@@ -484,12 +718,38 @@ datatype mnemonic =
  | NOP
  | NOT
  | OR
+ | PALIGNR
+ | PAND
+ | PCMPEQB
+ | PCMPEQQ
+ | PCMPESTRI
+ | PCMPGTB
+ | PCMPISTRI
  | PHADDD
  | PHADDW
+ | PINSRB
+ | PMOVMSKB
  | POP
+ | POR
+ | PREFETCHNTA
+ | PREFETCHT0
+ | PREFETCH_MODIFIED
+ | PSHUFB
+ | PSHUFD
+ | PSLLDQ
+ | PSRLDQ
+ | PSUBB
+ | PTEST
+ | PUNPCKLBW
+ | PUNPCKLQDQ
  | PUSH
+ | PXOR
+ | RDTSC
+ | RDTSCP
  | RET
  | RET_FAR
+ | ROL
+ | ROR
  | SAL
  | SAR
  | SBB
@@ -527,14 +787,20 @@ datatype mnemonic =
  | SETPO
  | SETS
  | SETZ
+ | SFENCE
  | SHL
+ | SHLD
  | SHR
+ | SHRD
  | STOSB
  | STOSD
  | STOSQ
  | STOSW
  | SUB
+ | SYSCALL
  | TEST
+ | UCOMISD
+ | UD2
  | VBMOVHPD
  | VBMOVHPS
  | VBMOVLPD
@@ -567,10 +833,16 @@ datatype mnemonic =
  | VMOVNTPD
  | VMOVNTPS
  | VMOVQ
+ | VPCMPEQQ
  | VPHADDD
  | VPHADDW
+ | VPMOVMSKB
  | XADD
+ | XCHG
+ | XGETBV
  | XOR
+ | XORPD
+ | XORPS
 
 val al = return (REG AL)
 val ah = return (REG AH)
@@ -658,6 +930,7 @@ val ymm12 = return (REG YMM12)
 val ymm13 = return (REG YMM13)
 val ymm14 = return (REG YMM14)
 val ymm15 = return (REG YMM15)
+val st0 = return (REG ST0)
 
 val imm8 ['b:8'] = return (IMM8 b)
 val imm16 ['b1:8' 'b2:8'] = return (IMM16 (b2 ^ b1))
@@ -679,11 +952,19 @@ end
 
 val otherwise = return '1'
 
+val vex128? = do
+   l <- query $vexl;
+   return (l == '0')
+end
+
+val vex256? = query $vexl
+
 val opndsz? = query $opndsz
 val addrsz? = query $addrsz
 val repne? =  query $repne
 val rep? = query $rep
 val rexw? = query $rexw
+val vexw? = query $rexw
 val rex? = query $rex
 val mod-mem? = do
    mod <- query $mod;
@@ -692,9 +973,24 @@ val mod-mem? = do
     | otherwise: return '0'
    end
 end
+
 val mode64? = query $mode64
 
 ## Convert a bit-vectors to registers
+
+val st n = 
+   case n of
+      '000': REG ST0
+    | '001': REG ST1
+    | '010': REG ST2
+    | '011': REG ST3
+    | '100': REG ST4
+    | '101': REG ST5
+    | '110': REG ST6
+    | '111': REG ST7
+  end
+
+val sti extension n = return (st n)
 
 val reg8 n =
    case n of
@@ -716,9 +1012,7 @@ val reg8 n =
     | '1111': REG R15B
    end
 
-val reg8-lower n = reg8 ('0' ^ n)
-val reg8-higher n = reg8 ('1' ^ n)
-val reg8-rex rex = if rex then reg8-higher else reg8-lower
+val reg8-rex rex reg-idx = reg8 (rex ^ reg-idx)
 
 val reg16 n =
    case n of
@@ -740,9 +1034,7 @@ val reg16 n =
     | '1111': REG R15L
    end
 
-val reg16-lower n = reg16 ('0' ^ n)
-val reg16-higher n = reg16 ('1' ^ n)
-val reg16-rex rex = if rex then reg16-higher else reg16-lower
+val reg16-rex rex reg-idx = reg16 (rex ^ reg-idx)
 
 val reg32 n =
    case n of
@@ -764,9 +1056,7 @@ val reg32 n =
     | '1111': REG R15D
    end
 
-val reg32-lower n = reg32 ('0' ^ n)
-val reg32-higher n = reg32 ('1' ^ n)
-val reg32-rex rex = if rex then reg32-higher else reg32-lower
+val reg32-rex rex reg-idx = reg32 (rex ^ reg-idx)
 
 val reg64 n =
    case n of
@@ -788,9 +1078,7 @@ val reg64 n =
     | '1111': REG R15
    end
 
-val reg64-lower n = reg64 ('0' ^ n)
-val reg64-higher n = reg64 ('1' ^ n)
-val reg64-rex rex = if rex then reg64-higher else reg64-lower
+val reg64-rex rex reg-idx = reg64 (rex ^ reg-idx)
 
 val sreg3 n =
    case n of
@@ -826,9 +1114,7 @@ val mm n =
     | '1111': REG MM15
    end
 
-val mm-lower n = mm ('0' ^ n)
-val mm-higher n = mm ('1' ^ n)
-val mm-rex rex = if rex then mm-higher else mm-lower
+val mm-rex rex reg-idx = mm (rex ^ reg-idx)
 
 val xmm n =
    case n of
@@ -850,9 +1136,7 @@ val xmm n =
     | '1111': REG XMM15
    end
 
-val xmm-lower n = xmm ('0' ^ n)
-val xmm-higher n = xmm ('1' ^ n)
-val xmm-rex rex = if rex then xmm-higher else xmm-lower
+val xmm-rex rex reg-idx = xmm (rex ^ reg-idx)
 
 val ymm n =
    case n of
@@ -874,9 +1158,7 @@ val ymm n =
     | '1111': REG YMM15
    end
 
-val ymm-lower n = ymm ('0' ^ n)
-val ymm-higher n = ymm ('1' ^ n)
-val ymm-rex rex = if rex then ymm-higher else ymm-lower
+val ymm-rex rex reg-idx = ymm (rex ^ reg-idx)
 
 # Deslice the mod/rm byte and put it into the the state
 
@@ -1034,6 +1316,16 @@ val xmm/m64 = r/m 64 xmm-rex
 val xmm/m32 = r/m 32 xmm-rex
 val ymm/m256 = r/m 256 ymm-rex
 
+val v/xmm = do
+   v <- query $vexv;
+   return (xmm v)
+end
+
+val v/ymm = do
+   v <- query $vexv;
+   return (ymm v)
+end
+
 val reg/nomem reg = do
    mod <- query $mod;
    case mod of
@@ -1059,6 +1351,11 @@ val m32 = m r/m32
 val m64 = m r/m64
 val m128 = m xmm/m128
 val m256 = m ymm/m256
+val m80fp = m r/m 80 reg64-rex #TODO: check
+
+val st/m16 = r/m 16 sti
+val st/m32 = r/m 32 sti
+val st/m64 = r/m 64 sti
 
 val r/rexb reg = do
    mod <- query $rexb;
@@ -1083,6 +1380,22 @@ val r64/rexb = r/rexb reg64-rex
 val mm64 = r/rexb mm-rex
 val xmm128 = r/rexr xmm-rex
 val ymm256 = r/rexr ymm-rex
+
+val reg = do
+   r <- query$rexw;
+   case r of
+      '1': r64
+    | '0': r32
+   end
+end
+
+val vreg = do
+   r <- query$vexw;
+   case r of
+      '1': r64
+    | '0': r32
+   end
+end
 
 #TODO: set correct `ptrty` for `moffs*`
 
@@ -1128,7 +1441,7 @@ end
 
 val near-abs cons giveOp = do
    op <- giveOp;
-   return (FLOW1 {tag=cons,opnd1=NEARABS {opnd=op}})
+   return (FLOW1 {tag=cons,opnd1=NEARABS op})
 end
 
 val near-rel cons giveOp = do
@@ -1138,10 +1451,101 @@ end
 
 val far-abs cons giveOp = do
    op <- giveOp;
-   return (FLOW1 {tag=cons,opnd1=FARABS {opnd=op}})
+   return (FLOW1 {tag=cons,opnd1=FARABS op})
 end
 
 val one = return (IMM8 '00000001')
+
+### ADC 
+val / [0x14] = binop ADC al imm8
+val / [0x15]
+ | opndsz? = binop ADC ax imm16
+ | rexw? = binop ADC rax imm32
+ | otherwise = binop ADC eax imm32
+val / [0x80 /2] = binop ADC r/m8 imm8
+val / [0x81 /2]
+ | opndsz? = binop ADC r/m16 imm16
+ | rexw? = binop ADC r/m64 imm32
+ | otherwise = binop ADC r/m32 imm32
+val / [0x83 /2]
+ | opndsz? = binop ADC r/m16 imm8
+ | rexw? = binop ADC r/m64 imm8
+ | otherwise = binop ADC r/m32 imm8
+val / [0x10 /r] = binop ADC r/m8 r8
+val / [0x11 /r]
+ | opndsz? = binop ADC r/m16 r16
+ | rexw? = binop ADC r/m64 r64
+ | otherwise = binop ADC r/m32 r32
+val / [0x12 /r] = binop ADC r8 r/m8
+val / [0x13 /r]
+ | opndsz? = binop ADC r16 r/m16
+ | rexw? = binop ADC r64 r/m64
+ | otherwise = binop ADC r32 r/m32 
+
+### BSF
+val / [0x0f 0xbc /r]
+ | opndsz? = binop BSF r16 r/m16
+ | rexw? = binop BSF r64 r/m64
+ | otherwise = binop BSF r32 r/m32
+
+### BSR
+val / [0x0f 0xbd /r]
+ | opndsz? = binop BSR r16 r/m16
+ | rexw? = binop BSR r64 r/m64
+ | otherwise = binop BSR r32 r/m32
+
+### CLD
+val / [0xfc] = arity0 CLD
+
+### CPUID
+val / [0x0f 0xa2] = arity0 CPUID
+
+### FCHS
+val / [0xd9 0xe0] = arity0 FCHS
+
+### FCMOVcc
+val / [0xda '11000 i:3'] = binop FCMOVB st0 (sti '0' i)
+val / [0xda '11001 i:3'] = binop FCMOVE st0 (sti '0' i)
+val / [0xda '11010 i:3'] = binop FCMOVBE st0 (sti '0' i)
+val / [0xda '10011 i:3'] = binop FCMOVU st0 (sti '0' i)
+val / [0xdb '11000 i:3'] = binop FCMOVNB st0 (sti '0' i)
+val / [0xdb '11001 i:3'] = binop FCMOVNE st0 (sti '0' i)
+val / [0xdb '11010 i:3'] = binop FCMOVNBE st0 (sti '0' i)
+val / [0xdb '10011 i:3'] = binop FCMOVNU st0 (sti '0' i)
+
+### FLD
+val / [0xd9 /0] = unop FLD st/m32
+val / [0xdd /0] = unop FLD m64
+val / [0xdb /5] = unop FLD m80fp
+
+### FLDCW
+val / [0xd9 /5] = unop FLDCW m2byte 
+
+val m14/28byte = m80fp #TODO: fix
+val m2byte = m16 #TODO: check
+
+### FLD1/FLDL2T/FLDL2E/FLDPI/FLDLG2/FLDLN2/FLDZ
+val / [0xd9 0xe8] = arity0 FLD1
+val / [0xd9 0xe9] = arity0 FLDL2T
+val / [0xd9 0xea] = arity0 FLDL2E
+val / [0xd9 0xeb] = arity0 FLDPI
+val / [0xd9 0xec] = arity0 FLDLG2
+val / [0xd9 0xed] = arity0 FLDLN2
+val / [0xd9 0xee] = arity0 FLDZ
+
+### FLDENV
+val / [0xd9 /4] = unop FLDENV m14/28byte
+
+### FSTCW/FNSTCW
+val / [0x9b 0xd9 /7] = unop FSTCW m2byte
+val / [0xd9 /7] = unop FNSTCW m2byte
+
+### FSTP
+val / [0xd9 /2] = unop FST m32
+val / [0xdd /2] = unop FST st/m64
+val / [0xd9 /3] = unop FSTP m32
+val / [0xdd /3] = unop FSTP st/m64
+val / [0xdb /7] = unop FSTP m80fp
 
 ### CALL 3-112 Vol. 2A
 val / [0xe8]
@@ -1281,11 +1685,17 @@ val / [0x0f '11001 r:3']
  | rexw? = do update@{reg/opcode=r}; unop BSWAP r64/rexb end 
  | otherwise = do update@{reg/opcode=r}; unop BSWAP r32/rexb end
 
+### NOP 4-12 Vol. 2B
+#val / [0x90] = arity0 NOP
+#val /66 [0x90] = arity0 NOP
+val /66 [0x0f 0x1f /0] = unop NOP r/m16
+val / [0x0f 0x1f /0] = unop NOP r/m32
+
 ### XCHG Vol. 2A 4-510
-val / ['10010 r:2 1']
- | opndsz? = do update@{reg/opcode=r^'1'}; binop XCHG ax r16/rexb end 
- | rexw? = do update@{reg/opcode=r^'1'}; binop XCHG rax r64/rexb end 
- | otherwise = do update@{reg/opcode=r^'1'}; binop XCHG eax r32/rexb end
+val / ['10010 r:3']
+ | opndsz? = do update@{reg/opcode=r}; binop XCHG ax r16/rexb end 
+ | rexw? = do update@{reg/opcode=r}; binop XCHG rax r64/rexb end 
+ | otherwise = do update@{reg/opcode=r}; binop XCHG eax r32/rexb end
 val / [0x86 /r] = binop XCHG r8 r/m8
 val / [0x87 /r]
  | opndsz? = binop XCHG r/m16 r16
@@ -1307,12 +1717,6 @@ val / [0x0f 0x01 0xf9] = arity0 RDTSCP
 
 ### SYSCALL Vol. 2B 4-438
 val / [0x0f 0x05] = arity0 SYSCALL
-
-### NOP 4-12 Vol. 2B
-val / [0x90] = arity0 NOP
-val /66 [0x90] = arity0 NOP
-val /66 [0x0f 0x1f /0] = unop NOP r/m16
-val / [0x0f 0x1f /0] = unop NOP r/m32
 
 ### RET 4-321 Vol. 2B
 val / [0xc3] = arity0 RET
@@ -1859,8 +2263,7 @@ val vmaxss = ternop VMAXSS
 val /f3 [0x0f 0x5f /r] = maxss xmm128 xmm/m32
 
 ### MFENCE Vol. 2B 4-23
-val mfence = return MFENCE
-val / [0x0f 0xae /6] = mfence
+val / [0x0f 0xae /6] = arity0 MFENCE
 
 ### MINPD Vol. 2B 4-25
 val minpd = binop MINPD
@@ -1881,6 +2284,15 @@ val /f2 [0x0f 0x5d /r] = minsd xmm128 xmm/m64
 val minss = binop MINSS
 val vminss = ternop VMINSS
 val /f3 [0x0f 0x5d /r] = minss xmm128 xmm/m32
+
+### PCMPEQQ
+val /66 [0x0f 0x38 0x29 /r] = binop PCMPEQQ xmm xmm/m128
+val / [/vex/66/0f/38 0x29 /r] | vex128? = ternop VPCMPEQQ xmm128 v/xmm xmm/m128 
+
+### PMOVMSKB
+val / [0x0f 0xd7 /r] = binop PMOVMSKB reg mm64
+val /66 [0x0f 0xd7 /r] = binop PMOVMSKB reg xmm/nomem128
+val / [/vex/66/0f 0xd7 /r] | vex128? = binop VPMOVMSKB vreg xmm/nomem128
 
 ### MONITOR Vol. 2B 4-35
 val monitor = return MONITOR
@@ -1965,16 +2377,21 @@ val vmovddup = binop VMOVDDUP
 val /f2 [0x0f 0x12 /r] = movddup xmm128 xmm/m64
 
 ### MOVDQA Vol. 2B 4-67
-val movdqa = binop MOVDQA
-val vmovdqa = binop VMOVDQA
-val /66 [0x0f 0x6f /r] = movdqa xmm128 xmm/m128
-val /66 [0x0f 0x7f /r] = movdqa xmm/m128 xmm128
+val /66 [0x0f 0x6f /r] = binop MOVDQA xmm128 xmm/m128
+val /66 [0x0f 0x7f /r] = binop MOVDQA xmm/m128 xmm128
+val / [/vex/66/0f 0x6f /r]
+ | vex128? = binop VMOVDQA xmm128 xmm/m128
+ | otherwise = binop VMOVDQA xmm/m128 xmm128
 
 ### MOVDQU Vol. 2B 4-70
-val movdqu = binop MOVDQU
-val vmovdqu = binop VMOVDQU
-val /f3 [0x0f 0x6f /r] = movdqu xmm128 xmm/m128
-val /f3 [0x0f 0x7f /r] = movdqu xmm/m128 xmm128
+val /f3 [0x0f 0x6f /r] = binop MOVDQU xmm128 xmm/m128
+val /f3 [0x0f 0x7f /r] = binop MOVDQU xmm/m128 xmm128
+val / [/vex/f3/0f 0x6f /r]
+ | vex128? = binop VMOVDQU xmm128 xmm/m128
+ | otherwise = binop VMOVDQU ymm256 ymm/m256
+val / [/vex/f3/0f 0x7f /r]
+ | vex128? = binop VMOVDQU xmm/m128 xmm128
+ | otherwise = binop VMOVDQU ymm/m256 ymm256
 
 ### MOVDQ2Q Vol. 2B 4-73
 val movdq2q = binop MOVDQ2Q
