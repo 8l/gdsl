@@ -44,9 +44,9 @@ int main (int argc, char** argv) {
     } else if (len==UNKNOWN_OPCODE) {
       invalid++;
       len = 1;
-    } else {
-      puts(dis->CompleteInstr);
-    }
+    } //else {
+      //puts(dis->CompleteInstr);
+    //}
     blobb += len;
     sz-=len;
     n++;
