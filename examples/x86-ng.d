@@ -505,6 +505,7 @@ datatype register =
  | ST5
  | ST6
  | ST7
+ | RIP
 
 datatype opnd =
    IMM8 of 8
@@ -1413,7 +1414,7 @@ val sib-with-index-and-base reg s i b = do
     | _:
          case b of
             '101': sib-without-base reg s i
-          | _: return (SUM{a=SCALE{imm=s, opnd=reg rexx i}, b=reg rexb b})
+          | _: return (SUM{b=SCALE{imm=s, opnd=reg rexx i}, a=reg rexb b})
          end
    end
 end
@@ -1467,8 +1468,11 @@ val r/m-without-sib = do
          case rm of
             '101':
                do
+                  mode <- query $mode64;
                   i <- imm32;
-                  mem i
+                  if mode
+                     then mem (SUM{a=REG RIP,b=i})
+                  else mem i
                end
           | _ : mem (addr-reg rexb rm)
          end
