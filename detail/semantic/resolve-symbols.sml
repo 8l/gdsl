@@ -23,7 +23,6 @@ end = struct
 
    infix >>= >>
 
-   fun resolveErr errStrm (pos, msg) = Error.errorAt(errStrm, (pos, pos), msg)
    val parseErr = Error.parseError SpecTokens.toString
    fun convMark conv {span, tree} = {span=span, tree=conv span tree}
    fun startScope () = ST.varTable := VI.push (!ST.varTable)
@@ -300,9 +299,9 @@ end = struct
 
    in
       (Primitives.registerPrimitives ()
-      ;convMark (fn s => List.map (regDecl s)) ast
+      ;List.map (regDecl SymbolTable.noSpan) ast
       (*;TextIO.print (smapToString (!specDec))*)
-      ;convMark (fn s => List.map (convDecl s)) ast)
+      ;List.map (convDecl SymbolTable.noSpan) ast)
    end
 
    val resolveSymbolPass =
