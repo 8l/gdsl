@@ -3,9 +3,11 @@
 # The following functions need to be defined elsewhere:
 #   - arch-show-id
 
-export = rreil-pretty
+export = rreil-pretty rreil-pretty-rev rreil-pretty-stmt
 
+val rreil-pretty-stmt s = rreil-show-stmt s
 val rreil-pretty ss = rreil-show-stmts ss
+val rreil-pretty-rev ss = rreil-show-stmts (rreil-stmts-rev ss)
 
 val rreil-show-stmts ss =
    case ss of  
@@ -16,9 +18,9 @@ val rreil-show-stmts ss =
 val rreil-show-stmt s =
    case s of
       SEM_ASSIGN x: rreil-show-var x.lhs +++ " = " +++ rreil-show-op x.rhs 
-    | SEM_LOAD x: rreil-show-var x.lhs +++ " = " rreil-show-ptrderef x.size x.address
+    | SEM_LOAD x: rreil-show-var x.lhs +++ " = " +++ rreil-show-ptrderef x.size x.address
     | SEM_STORE x: "*" +++ rreil-show-address x.address +++ " = " +++ rreil-show-op x.rhs
-    | SEM_LABEL x: rreil-show-label x.id
+    | SEM_LABEL x: rreil-show-label x.label
     | SEM_IF_GOTO_LABEL x: "if (" +++ rreil-show-linear x.cond +++ ") goto label " +++ rreil-show-label x.label
     | SEM_IF_GOTO x: "if (" +++ rreil-show-linear x.cond +++ ") goto " +++ rreil-show-linear x.target
     | SEM_CALL x: "if (" +++ rreil-show-linear x.cond +++ ") call " +++ rreil-show-address x.target
@@ -49,7 +51,7 @@ val rreil-show-op op =
     | SEM_CMPLEU x: "<=u" +++ rreil-show-cmp x
     | SEM_CMPLTS x: "<s" +++ rreil-show-cmp x
     | SEM_CMPLTU x: "<u" +++ rreil-show-cmp x
-    | SEM_ARB x: "arbitrary[" +++ showint x +++ "]"
+    | SEM_ARB x: "arbitrary[" +++ showint x.size +++ "]"
    end
 
 val rreil-show-arity1 x = "[" +++ showint x.size +++ "](" +++ rreil-show-linear x.opnd1 +++ ")"

@@ -42,6 +42,7 @@ end = struct
          val consume32 = get "consume32"
          val unconsume32 = get "unconsume32"
          val andd = get "and"
+         val orr = get "or"
          val concat = get "^"
          val == = get "=="
          val not = get "not"
@@ -209,6 +210,19 @@ end = struct
                (andd, [a, b], body)
             end
 
+         (* val or a b = %or(a,b) *)
+         val orr =
+            let
+               val a = fresh "a"
+               val b = fresh "b"
+               val prim = get "%or"
+               val body = PRI (prim, [a, b])
+                     
+            in
+               (orr, [a, b], body)
+            end
+
+
          (* val == a b = %equal(a,b) *)
          val == =
             let
@@ -335,6 +349,7 @@ end = struct
           showbitvec,
           showint,
           andd,
+          orr,
           not,
           ==,
           concat,
@@ -444,9 +459,7 @@ end = struct
                            case ks of
                               [([],body)] =>
                                  Exp.LETCONT
-                                    ((j, [x], kappa x)::cps,
-                                     Exp.CC body)
-
+                                    ((j, [x], kappa x)::cps, body)
                             | _ =>
                                  Exp.LETCONT
                                     ((j, [x], kappa x)::cps,
@@ -637,7 +650,7 @@ end = struct
              | ID x => SOME x
              | _ => NONE
       in
-         (bndVars p, (toIdx p, (k, []))::ks)
+         (bndVars p, (toIdx p, Exp.CC (k, []))::ks)
       end
 
    and trans0rec (n, args, e) =
@@ -690,10 +703,8 @@ end = struct
                         end
                    | [] =>
                         case ks of
-                           [([],body)] =>
-                              Exp.LETCONT (cps, Exp.CC body)
-                         | _ =>
-                              Exp.LETCONT (cps, Exp.CASE (ty, z, ks))
+                           [([],body)] => Exp.LETCONT (cps, body)
+                         | _ => Exp.LETCONT (cps, Exp.CASE (ty, z, ks))
             in
                trans0 e (fn z => trans z ps [] [])
             end

@@ -16,6 +16,7 @@
 export =
    bbtree-size
    bbtree-empty
+   bbtree-empty?
    bbtree-singleton
    bbtree-add
    bbtree-add-with
@@ -45,15 +46,15 @@ export =
    intset-remove-min
    intset-fold
 
-   fitree-lt?
+   fitree-lt? { hi, lo }
    fitree-size
    fitree-empty
    fitree-singleton
-   fitree-add
+   fitree-add { hi, lo }
    fitree-intersection
    fitree-difference
    fitree-interval-difference
-   fitree-contains?
+   fitree-contains? { hi, lo }
    fitree-union
    #fitree-remove
    fitree-remove-min
@@ -292,7 +293,7 @@ val bbtree-difference lt? btl btr =
       Lf: btl
     | Br l:
          case btr of
-            Lf: btr
+            Lf: btl
           | Br r:
                bbtree-concat
                   (bbtree-difference
@@ -449,7 +450,7 @@ val fitree-lt? a b =
 val interval-overlaps? x y = x.lo <= y.hi and y.lo <= x.hi
 val interval-contains? x y = x.lo <= y.lo and y.hi <= x.hi
    
-val fitree-search p? it x =
+val fitree-collect p? it x =
    let
       val maybe-search-left it acc =
          case it of
@@ -516,17 +517,50 @@ val fitree-any p? it x =
    end
 
 val fitree-any-overlapping? t x = fitree-any interval-overlaps? t x
-val fitree-search-contained t x = fitree-search interval-contains? t x
-val fitree-search-overlapping t x = fitree-search interval-overlaps? t x
+val fitree-collect-contained t x = fitree-collect interval-contains? t x
+val fitree-collect-overlapping t x = fitree-collect interval-overlaps? t x
 
-# TODO:
-#   Real interval difference supporting interval splitting, cutting and 
-#   full interval containing 
+val fitree-interval-split t x =
+   let
+      val split acc x y = 
+         # x is contained in y but not equal
+         if interval-contains? y x
+            then
+               if y.hi === x.hi
+                  then fitree-add acc {lo=y.lo, hi=x.lo - 1}
+               else
+                  fitree-add
+                     (if y.lo === x.lo
+                         then acc
+                      else fitree-add acc {lo=y.lo, hi=x.lo - 1})
+                     {lo=x.hi + 1,hi=y.hi}
+         else
+            if x.lo < y.lo
+               then fitree-add acc {lo=x.hi + 1, hi=y.hi}
+            # x.lo > y.lo, {===} is not possible
+            else fitree-add acc {lo=y.lo, hi=x.lo - 1}
+
+      val interval-split acc y =
+         if interval-contains? x y
+            then acc
+         else if interval-overlaps? x y
+            then split acc x y
+         else fitree-add acc y
+   in
+      fitree-fold interval-split (fitree-empty {}) t
+   end
+
 val fitree-interval-difference a b =
    let
-      val remove-contained it x = fitree-difference it (fitree-search-contained it x)
+      val rebuild t overlapping x =
+         fitree-union
+            (fitree-difference t overlapping)
+            (fitree-interval-split overlapping x)
+
+      val rebuild-overlapping t x =
+         rebuild t (fitree-collect-overlapping t x) x
    in
-      fitree-fold remove-contained a b
+      fitree-fold rebuild-overlapping a b
    end
 
 val fitree-mk l h = {lo=l, hi=h}
@@ -543,10 +577,10 @@ val fitree-size s = bbtree-size s
 val fitree-fold f s t = bbtree-fold f s t
 val fitree-pretty t =
    let
-      val prettyInterval x =
+      val pretty-interval x =
          "[" +++ showint x.lo +++ "," +++ showint x.hi +++ "]"
    in
-      bbtree-pretty prettyInterval t
+      bbtree-pretty pretty-interval t
    end
 
 # TODO: Port the following {hedge union} sml code to GDSL
