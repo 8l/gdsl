@@ -133,6 +133,7 @@ val p/vex/66/0f [0xc4 'r:1 x:1 b:1 00001' 'w:1 v:4 l:1 01'] = do
         rexx=not x,
         vexl=l,
         vexv=complement v,
+
         vexm='00001'}
 end
 
@@ -651,15 +652,42 @@ type insn =
  | CVTTSD2SI of arity2
  | CVTTSS2SI of arity2
  | CWD
+ | CWDE
  | CDQ 
  | CQO
  | DAA
  | DAS
-
- | CWDE
  | DEC of arity1
  | DIV of arity1
- | DIVSD of arity1
+ | DIVPD of arity2
+ | DIVPS of arity2
+ | DIVSD of arity2
+ | DIVSS of arity2
+ | DPPD of arity3
+ | DPPS of arity3
+ | EMMS
+ | ENTER of arity2
+ | EXTRACTPS of arity3
+ | F2XM1
+ | FABS
+ | FADD_m32fp
+ | FADD_m64fp
+ | FADD of arity2
+ | FADDP of varity
+ | FIADD_m32int
+ | FIADD_m16int
+ | FBLD_m80_dec
+ | FBSTP_m80bcd
+ | FCLEX
+ | FNCLEX
+ | FCOM_m32fp
+ | FCOM_m64fp
+ | FCOM of varity
+ | FCOMP_m32fp
+ | FCOMP_m64fp
+ | FCOMP of varity
+ | FCOMPP
+
  | FCHS
  | FCMOVB of arity2
  | FCMOVBE of arity2
@@ -991,6 +1019,13 @@ type insn =
  | VCVTTPS2DQ of varity
  | VCVTTSD2SI of varity
  | VCVTTSS2SI of varity
+ | VDIVPD of varity
+ | VDIVPS of varity
+ | VDIVSD of varity
+ | VDIVSS of varity
+ | VDPPD of varity
+ | VDPPS of varity
+ | VEXTRACTPS of varity
 
  | VLDDQU of varity
  | VMASKMOVDQU of varity
@@ -2489,13 +2524,90 @@ val / [0xf7 /6]
  | rexw? = unop DIV r/m64
  | otherwise = unop DIV r/m32
 
+### DIVPD
+###  - Divide Packed Double-Precision Floating-Point Values
+val /66 [0x0f 0x5e /r] = binop DIVPD xmm128 xmm/m128
+val /vex/66/0f/vexv [0x5e /r]
+ | vex128? = varity3 VDIVPD xmm128 v/xmm xmm/m128
+ | vex256? = varity3 VDIVPD xmm128 v/xmm xmm/m128
+
+### DIVPS
+###  - Divide Packed Single-Precision Floating-Point Values
+val / [0x0f 0x5e /r] = binop DIVPS xmm128 xmm/m128
+val /vex/0f/vexv [0x5e /r]
+ | vex128? = varity3 VDIVPS xmm128 v/xmm xmm/m128
+ | vex256? = varity3 VDIVPS xmm128 v/xmm xmm/m128
+
 ### DIVSD
 ###  - Divide Scalar Double-Precision Floating-Point Values
 val /f2 [0x0f 0x5e /r] = binop DIVSD xmm128 xmm/m64
+val /vex/0f/f2/vexv [0x5e /r] = varity3 VDIVSD xmm128 v/xmm xmm/m64
+
+### DIVSS
+###  - Divide Scalar Single-Precision Floating-Point Values
+val /f3 [0x0f 0x5e /r] = binop DIVSS xmm128 xmm/m32
+val /vex/0f/f3/vexv [0x5e /r] = varity3 VDIVSS xmm128 v/xmm xmm/m32
+
+### DPPD
+###  - Dot Product of Packed Double Precision Floating-Point Values
+val /66 [0x0f 0x3a 0x41 /r] = ternop DPPD xmm128 xmm/m128 imm8
+val /vex/66/0f/3a/vexv [0x41 /r] | vex128? = varity4 VDPPD xmm128 v/xmm xmm/m128 imm8
+
+### DPPS
+###  - Dot Product of Packed Single Precision Floating-Point Values
+val /66 [0x0f 0x3a 0x40 /r] = ternop DPPS xmm128 xmm/m128 imm8
+val /vex/66/0f/3a/vexv [0x40 /r]
+ | vex128? = varity4 VDPPS xmm128 v/xmm xmm/m128 imm8
+ | vex256? = varity4 VDPPS xmm128 v/xmm xmm/m128 imm8
+
+### EMMS
+###  - Empty MMX Technology State
+val / [0x0f 0x77] = arity0 EMMS
+
+### ENTER
+###  - Make Stack Frame for Procedure Parameters
+val / [0xc8] = binop ENTER imm16 imm8
+
+### EXTRACTPS
+###  - Extract Packed Single Precision Floating-Point Value
+val /66 [0x0f 0x3a 0x17 /r] = ternop EXTRACTPS r/m32 xmm128 imm8
+val /vex/66/0f/3a [0x17 /r] | vex128? = varity3 VEXTRACTPS r/m32 xmm128 imm8
+
+### F2XM1
+###  - Compute 2^x-1
+val / [0xd9 0xf0] = arity0 F2XM1
+
+### FABS
+###  - Absolute Value
+val / [0xd9 0xe1] = arity0 FABS
+
+### FADD/FADDP/FIADD
+###  - Add
+val / [0xd8 /0] = arity0 FADD_m32fp 
+val / [0xdc /0] = arity0 FADD_m64fp 
+val / [0xd8 '11000 i:3'] = binop FADD st0 (st/i i)
+val / [0xdc '11000 i:3'] = binop FADD (st/i i) st0
+val / [0xde '11000 i:3'] = varity2 FADDP (st/i i) st0
+val / [0xde 0xc1] = varity0 FADDP
+val / [0xda /0] = arity0 FIADD_m32int
+val / [0xde /0] = arity0 FIADD_m16int
+
+### FBLD
+###  - Load Binary Coded Decimal
+val / [0xdf /4] = arity0 FBLD_m80_dec 
+
+### FBSTP
+###  - Store BCD Integer and Pop
+val / [0xdf /6] = arity0 FBSTP_m80bcd
 
 ### FCHS
 ###  - Change Sign
 val / [0xd9 0xe0] = arity0 FCHS
+
+### FCLEX/FNCLEX
+###  - Clear Exceptions
+val / [0x9b 0xdb 0xe2] = arity0 FCLEX
+val / [0xdb 0xe2] = arity0 FNCLEX
 
 ### FCMOVcc
 ###  - Floating-Point Conditional Move
@@ -2507,6 +2619,18 @@ val / [0xdb '11000 i:3'] = binop FCMOVNB st0 (st/i i)
 val / [0xdb '11001 i:3'] = binop FCMOVNE st0 (st/i i)
 val / [0xdb '11010 i:3'] = binop FCMOVNBE st0 (st/i i)
 val / [0xdb '10011 i:3'] = binop FCMOVNU st0 (st/i i)
+
+### FCOM/FCOMP/FCOMPP
+###  - Compare Floating Point Values
+val / [0xd8 /2] = arity0 FCOM_m32fp 
+val / [0xdc /2] = arity0 FCOM_m64fp 
+val / [0xd8 '11010 i:3'] = varity1 FCOM (st/i i)
+val / [0xd8 0xd1] = varity0 FCOM
+val / [0xd8 /3] = arity0 FCOMP_m32fp
+val / [0xdc /3] = arity0 FCOMP_m64fp 
+val / [0xd8 '11011 i:3'] = varity1 FCOMP (st/i i)
+val / [0xd8 0xd9] = varity0 FCOMP 
+val / [0xde 0xd9] = arity0 FCOMPP
 
 ### FCOMI/FCOMIP/FUCOMI/FUCOMIP
 ###  - Compare Floating Point Values and Set EFLAGS
